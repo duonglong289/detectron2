@@ -8,6 +8,8 @@ This script is similar to the training script in detectron2/tools.
 
 It is an example of how a user might use detectron2 for a new project.
 """
+import os
+import torch
 
 import detectron2.utils.comm as comm
 from detectron2.config import get_cfg
@@ -22,6 +24,23 @@ from densepose.modeling.densepose_checkpoint import DensePoseCheckpointer
 
 
 def setup(args):
+    # Regist own dataset.
+    from detectron2.data.datasets import register_coco_instances
+    folder_data = "/root/detectron2/MADS_data_train_test/80_20_tonghop"
+
+    # train_data
+    name        = "mads_train"
+    json_file   = os.path.join(folder_data, "train.json")
+    image_root  = os.path.join(folder_data, "train", "images")
+
+    # test data
+    name_val        = "mads_val"
+    json_file_val   = os.path.join(folder_data, "val.json")
+    image_root_val  = os.path.join(folder_data, "val", "images")
+
+    # registr
+    register_coco_instances(name, {}, json_file, image_root)
+    register_coco_instances(name_val, {}, json_file_val, image_root_val)
     cfg = get_cfg()
     add_densepose_config(cfg)
     cfg.merge_from_file(args.config_file)

@@ -22,12 +22,12 @@ MODEL:
     SIZE_DIVISIBILITY: 640
     USE_DEPTHWISE_SEPARABLE_CONV: True
 DATASETS:
-  TRAIN: ("coco_2017_train_panoptic",)
-  TEST: ("coco_2017_val_panoptic",)
+  TRAIN: ("mads_train",)
+  TEST: ("mads_val",)
 SOLVER:
   BASE_LR: 0.0005
   MAX_ITER: 200000
-  IMS_PER_BATCH: 64
+  IMS_PER_BATCH: 2
 INPUT:
   FORMAT: "RGB"
   GAUSSIAN_SIGMA: 8

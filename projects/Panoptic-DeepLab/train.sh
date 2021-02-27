@@ -1,0 +1,2 @@
+CUDA_HOME=/  python3 train_net.py \
+    --config /root/detectron2/projects/Panoptic-DeepLab/configs/COCO-PanopticSegmentation/panoptic_deeplab_R_52_os16_mg124_poly_200k_bs64_crop_640_640_coco_dsconv.yaml

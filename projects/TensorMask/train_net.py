@@ -40,6 +40,24 @@ def setup(args):
 
 
 def main(args):
+    # Regist own dataset.
+    from detectron2.data.datasets import register_coco_instances
+    folder_data = "/root/detectron2/MADS_data_train_test/80_20_tonghop"
+
+    # train_data
+    name        = "mads_train"
+    json_file   = os.path.join(folder_data, "train.json")
+    image_root  = os.path.join(folder_data, "train", "images")
+
+    # test data
+    name_val        = "mads_val"
+    json_file_val   = os.path.join(folder_data, "val.json")
+    image_root_val  = os.path.join(folder_data, "val", "images")
+
+    # registr
+    register_coco_instances(name, {}, json_file, image_root)
+    register_coco_instances(name_val, {}, json_file_val, image_root_val)
+
     cfg = setup(args)
 
     if args.eval_only:
