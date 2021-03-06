@@ -37,8 +37,8 @@ def setup(args):
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
 
-    if args.eval_only:
-        cfg.MODEL.WEIGHTS = "/root/detectron2/projects/TridentNet/log_80_20/model_0029999.pth"
+    # if args.eval_only:
+    #     cfg.MODEL.WEIGHTS = "/root/detectron2/projects/TridentNet/log_80_20/model_0029999.pth"
     cfg.freeze()
     default_setup(cfg, args)
     return cfg

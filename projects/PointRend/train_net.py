@@ -117,8 +117,8 @@ def setup(args):
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
 
-    if args.eval_only:
-        cfg.MODEL.WEIGHTS = "/root/detectron2/projects/PointRend/log_50_50/model_0014999.pth"
+    # if args.eval_only:
+    #     cfg.MODEL.WEIGHTS = "/root/detectron2/projects/PointRend/log_50_50/model_0014999.pth"
 
     cfg.freeze()
     default_setup(cfg, args)
