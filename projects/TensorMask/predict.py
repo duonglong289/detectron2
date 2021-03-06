@@ -8,6 +8,9 @@ This script is a simplified version of the training script in detectron2/tools.
 """
 
 import os
+import cv2
+import numpy as np
+from tqdm import tqdm
 
 import detectron2.utils.comm as comm
 from detectron2.checkpoint import DetectionCheckpointer
@@ -15,15 +18,10 @@ from detectron2.config import get_cfg
 from detectron2.engine import DefaultTrainer, default_argument_parser, default_setup, launch, DefaultPredictor
 from detectron2.evaluation import COCOEvaluator, verify_results
 
+from detectron2.utils.visualizer import Visualizer
+
 from tensormask import add_tensormask_config
-
-
-class Trainer(DefaultTrainer):
-    @classmethod
-    def build_evaluator(cls, cfg, dataset_name, output_folder=None):
-        if output_folder is None:
-            output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
-        return COCOEvaluator(dataset_name, output_dir=output_folder)
+from detectron2.data import MetadataCatalog, DatasetCatalog
 
 
 def setup(args):
@@ -32,15 +30,10 @@ def setup(args):
     """
     cfg = get_cfg()
     add_tensormask_config(cfg)
-    cfg.merge_from_file(args.config_file)
-    cfg.merge_from_list(args.opts)
+    cfg.merge_from_file("/root/detectron2/projects/TensorMask/configs/tensormask_R_50_FPN_1x.yaml")
+    # cfg.merge_from_list(args.opts)
+    cfg.MODEL.WEIGHTS = "/root/detectron2/projects/TensorMask/log_80_20/model_0024999.pth"
 
-    if args.eval_only:
-        cfg.MODEL.WEIGHTS = "/root/detectron2/projects/TensorMask/log_50_50/model_0034999.pth"
-        cfg.SOLVER.IMS_PER_BATCH = 6
-
-    cfg.freeze()
-    default_setup(cfg, args)
     return cfg
 
 
@@ -64,32 +57,35 @@ def main(args):
     register_coco_instances(name_val, {}, json_file_val, image_root_val)
 
     cfg = setup(args)
+    predictor = DefaultPredictor(cfg)
 
-    if args.eval_only:
-        model = Trainer.build_model(cfg)
-        DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
-            cfg.MODEL.WEIGHTS, resume=args.resume
-        )
-        res = Trainer.test(cfg, model)
-        if comm.is_main_process():
-            verify_results(cfg, res)
+    img = cv2.imread("/root/detectron2/MADS_data_train_test/50_50_tonghop/train/images/HipHop1_ (1).jpg")
+    
+    outputs = predictor(img)
 
 
-        return res
+    v = Visualizer(img[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
+    out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+    cv2.imwrite("test.png", out.get_image()[:, :, ::-1])
 
-    trainer = Trainer(cfg)
-    trainer.resume_or_load(resume=args.resume)
-    return trainer.train()
+    # import ipdb; ipdb.set_trace()
+    # # print(outputs["instances"].pred_classes)
+    # # print(outputs["instances"].pred_boxes)
+
+    np_outputs = outputs["instances"].pred_masks.cpu().numpy()
+    h, w, _ = img.shape
+    zero_mask = np.zeros((h, w), np.uint8)
+
+    for pred_mask in tqdm(np_outputs):
+        
+        zero_mask = cv2.bitwise_or(zero_mask, pred_mask.astype(np.uint8)*255)
+
+    cv2.imwrite("test.png", zero_mask)
+    import ipdb; ipdb.set_trace()
+
 
 
 if __name__ == "__main__":
     args = default_argument_parser().parse_args()
-    print("Command Line Args:", args)
-    launch(
-        main,
-        args.num_gpus,
-        num_machines=args.num_machines,
-        machine_rank=args.machine_rank,
-        dist_url=args.dist_url,
-        args=(args,),
-    )
+    main(args)
+
