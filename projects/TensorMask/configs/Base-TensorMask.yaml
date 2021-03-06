@@ -18,7 +18,7 @@ DATASETS:
   TRAIN: ("mads_train",)
   TEST: ("mads_val",)
 SOLVER:
-  IMS_PER_BATCH: 2
+  IMS_PER_BATCH: 6
   BASE_LR: 0.02
   STEPS: (60000, 80000)
   MAX_ITER: 90000

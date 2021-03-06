@@ -36,7 +36,8 @@ def setup(args):
     cfg.merge_from_list(args.opts)
 
     if args.eval_only:
-        cfg.MODEL.WEIGHTS = "/root/detectron2/projects/TensorMask/log_80_20/model_0024999.pth"
+        cfg.MODEL.WEIGHTS = "/root/detectron2/projects/TensorMask/log_70_30/model_0019999.pth"
+        cfg.SOLVER.IMS_PER_BATCH = 6
 
     cfg.freeze()
     default_setup(cfg, args)
@@ -46,7 +47,7 @@ def setup(args):
 def main(args):
     # Regist own dataset.
     from detectron2.data.datasets import register_coco_instances
-    folder_data = "/root/detectron2/MADS_data_train_test/80_20_tonghop"
+    folder_data = "/root/detectron2/MADS_data_train_test/70_30_tonghop"
 
     # train_data
     name        = "mads_train"

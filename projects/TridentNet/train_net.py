@@ -29,7 +29,23 @@ def setup(args):
     """
     Create configs and perform basic setups.
     """
-    # Regist own dataset.
+
+
+
+    cfg = get_cfg()
+    add_tridentnet_config(cfg)
+    cfg.merge_from_file(args.config_file)
+    cfg.merge_from_list(args.opts)
+
+    if args.eval_only:
+        cfg.MODEL.WEIGHTS = "/root/detectron2/projects/TridentNet/log_80_20/model_0029999.pth"
+    cfg.freeze()
+    default_setup(cfg, args)
+    return cfg
+
+
+def main(args):
+        # Regist own dataset.
     from detectron2.data.datasets import register_coco_instances
     folder_data = "/root/detectron2/MADS_data_train_test/80_20_tonghop"
 
@@ -42,20 +58,11 @@ def setup(args):
     name_val        = "mads_val"
     json_file_val   = os.path.join(folder_data, "val.json")
     image_root_val  = os.path.join(folder_data, "val", "images")
-
+    
     # registr
     register_coco_instances(name, {}, json_file, image_root)
     register_coco_instances(name_val, {}, json_file_val, image_root_val)
-    cfg = get_cfg()
-    add_tridentnet_config(cfg)
-    cfg.merge_from_file(args.config_file)
-    cfg.merge_from_list(args.opts)
-    cfg.freeze()
-    default_setup(cfg, args)
-    return cfg
 
-
-def main(args):
     cfg = setup(args)
 
     if args.eval_only:
