@@ -64,24 +64,29 @@ def main(args):
     outputs = predictor(img)
 
 
-    v = Visualizer(img[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
-    out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-    cv2.imwrite("test.png", out.get_image()[:, :, ::-1])
+    # v = Visualizer(img[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
+    # out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+    # cv2.imwrite("test.png", out.get_image()[:, :, ::-1])
+    # print(outputs["instances"].pred_classes)
+    # print(outputs["instances"].pred_boxes)
 
-    # import ipdb; ipdb.set_trace()
-    # # print(outputs["instances"].pred_classes)
-    # # print(outputs["instances"].pred_boxes)
 
     np_outputs = outputs["instances"].pred_masks.cpu().numpy()
     h, w, _ = img.shape
     zero_mask = np.zeros((h, w), np.uint8)
 
     for pred_mask in tqdm(np_outputs):
-        
         zero_mask = cv2.bitwise_or(zero_mask, pred_mask.astype(np.uint8)*255)
 
-    cv2.imwrite("test.png", zero_mask)
-    import ipdb; ipdb.set_trace()
+
+    if cv2.__version__.startswith("3."):
+        _, contours, _ = cv2.findContours(zero_mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    else:
+        contours, _ = cv2.findContours(zero_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    cv2.drawContours(img, contours, -1, (0, 255, 0), 3)
+
+    cv2.imwrite("test1.png", img)   
 
 
 
