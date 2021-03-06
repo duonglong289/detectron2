@@ -34,6 +34,10 @@ def setup(args):
     add_tensormask_config(cfg)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
+
+    if args.eval_only:
+        cfg.MODEL.WEIGHTS = "/root/detectron2/projects/TensorMask/log_80_20/model_0024999.pth"
+
     cfg.freeze()
     default_setup(cfg, args)
     return cfg

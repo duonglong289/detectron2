@@ -116,6 +116,10 @@ def setup(args):
     add_pointrend_config(cfg)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
+
+    if args.eval_only:
+        cfg.MODEL.WEIGHTS = "/root/detectron2/projects/PointRend/log_50_50/model_0014999.pth"
+
     cfg.freeze()
     default_setup(cfg, args)
     return cfg
@@ -124,7 +128,7 @@ def setup(args):
 def main(args):
     # Regist own dataset.
     from detectron2.data.datasets import register_coco_instances
-    folder_data = "/root/detectron2/MADS_data_train_test/80_20_tonghop"
+    folder_data = "/root/detectron2/MADS_data_train_test/50_50_tonghop"
 
     # train_data
     name        = "mads_train"

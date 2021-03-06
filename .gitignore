@@ -54,3 +54,7 @@ _darcs
 
 
 MADS_data_train_test
+
+log*
+output*
+*.tar.gz
